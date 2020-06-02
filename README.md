@@ -1,5 +1,8 @@
-<h1>B2W for Women - Desafio API Star Wars</h1>
+<h1> B2W for Women - Desafio API Star Wars </h1>
 
+<div align="center">
+  <img src="img/starwarsgrils.png"/> 
+</div>
 
 ## Índice
 
