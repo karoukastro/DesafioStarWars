@@ -1,5 +1,7 @@
 package com.b2w.api.responses;
 
+import com.b2w.api.models.Planeta;
+
 /**
  * 
  * @author Carolina Castro
@@ -8,13 +10,13 @@ package com.b2w.api.responses;
  *
  */
 public class PlanetaResponse {
-
+	
 	private String id;
 	private String nome;
 	private String clima;
 	private String terreno;
 	private int numAparicoes;
-				
+		
 	public PlanetaResponse(String id, String nome, String clima, String terreno, int numAparicoes) {
 		this.id = id;
 		this.nome = nome;
@@ -29,6 +31,14 @@ public class PlanetaResponse {
 		this.clima = clima;
 		this.terreno = terreno;
 		this.numAparicoes = 0;
+	}
+	
+	public PlanetaResponse(Planeta planeta, int aparicoes) {
+		this.id = planeta.getId();
+		this.nome = planeta.getNome();
+		this.clima = planeta.getClima();
+		this.terreno = planeta.getTerreno();
+		this.numAparicoes = aparicoes;
 	}
 
 	public String getId() {

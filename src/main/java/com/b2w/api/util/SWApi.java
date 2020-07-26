@@ -15,7 +15,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.b2w.api.exception.ServiceUnavailable;
 import com.b2w.api.models.Planeta;
 import com.b2w.api.models.ResultApiSw;
-import com.b2w.api.services.PlanetaService;
+import com.b2w.api.services.CadastroPlanetaService;
+import com.b2w.api.services.impl.CadastroPlanetaServiceImpl;
 
 /**
  * 
@@ -33,13 +34,13 @@ public class SWApi {
 	private String url = "https://swapi.dev/api/"; 
 	
 	@Autowired
-	private PlanetaService planetaService;
+	private CadastroPlanetaServiceImpl planetaService;
 	
 	/*
 	 * Recebe o nome do Planeta, pesquisa quantas vezes ele apareceu em filmes e retorna o valor
 	 */
 	public int verificarAparicoes(String nome) {
-	Planeta planetasRetornado =  this.planetaService.listarPorNome(nome);
+	Planeta planetasRetornado =  planetaService.listarPorNome(nome);
 		if(planetasRetornado != null) {
 			ResponseEntity<ResultApiSw> response = getAparicoes(nome);
 			if(response.getBody().getResults().size()> 0 ) {
@@ -77,6 +78,5 @@ public class SWApi {
 		}catch(RestClientException e) {
 			throw new ServiceUnavailable("A API do Star Wars está fora do ar");
 		}
-   	}
-    
+   	}    
 }

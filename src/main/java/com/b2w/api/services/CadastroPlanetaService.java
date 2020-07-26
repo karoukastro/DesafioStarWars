@@ -5,15 +5,15 @@ import java.util.Optional;
 
 import com.b2w.api.models.Planeta;
 
-public interface PlanetaService {
+public interface CadastroPlanetaService {
 
 	List<Planeta> listarTodos();
 	
-	Optional<Planeta> listarPorId(String id);
+	Planeta listarPorId(String id);
 	Planeta listarPorNome(String nome);
 	Planeta adicionar(Planeta planeta);
-	Planeta modificar(Planeta planeta);
-	void deletar(String id);
+	Planeta modificar(String id, Planeta planeta);
+	void remover(String id);
 	long getValues();
 	
 }
