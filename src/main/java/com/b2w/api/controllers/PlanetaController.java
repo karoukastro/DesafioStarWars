@@ -2,8 +2,11 @@ package com.b2w.api.controllers;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
 import javax.validation.Valid;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,9 +19,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.b2w.api.models.Planeta;
+import com.b2w.api.repositories.PlanetaRepository;
 import com.b2w.api.responses.CountResponse;
 import com.b2w.api.responses.PlanetaResponse;
-import com.b2w.api.services.impl.CadastroPlanetaServiceImpl;
+import com.b2w.api.services.impl.CadastroPlanetaService;
 import com.b2w.api.util.SWApi;
 import com.b2w.api.exception.EntidadeNaoEncontradaException;
 
@@ -27,75 +31,68 @@ import com.b2w.api.exception.EntidadeNaoEncontradaException;
 public class PlanetaController {
 		
 	@Autowired
-	private CadastroPlanetaServiceImpl cadastroPlanetaService;
+	private CadastroPlanetaService cadastroPlaneta;
+	
+	@Autowired
+	private PlanetaRepository planetaRepository;
 	
 	@Autowired
 	private SWApi swapi;
 	
 	@GetMapping
 	public ResponseEntity<CountResponse<List<PlanetaResponse>>> listarTodos(){
-		List<Planeta> planetasRetornados = cadastroPlanetaService.listarTodos();
+		List<Planeta> planetasRetornados = planetaRepository.findAll();
 		return ResponseEntity.ok(new CountResponse<List<PlanetaResponse>>(planetasRetornados.size(), insereAparicoes(planetasRetornados)));
 	}
 	
 	@GetMapping(value = "/id/{id}")
 	public ResponseEntity<?> listarPorId(@PathVariable String id){
-		try {
-			Planeta planeta = cadastroPlanetaService.listarPorId(id);
+			Optional<Planeta> planeta = planetaRepository.findById(id);
 		
-			return ResponseEntity
-					.ok(new PlanetaResponse(planeta, swapi.verificarAparicoes(planeta.getNome())));
-			
-		}catch (EntidadeNaoEncontradaException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND)
-					.body(e.getMessage());
-		}
+			if(planeta.isPresent()) {
+				return ResponseEntity
+					.ok(new PlanetaResponse(planeta.get(), swapi.verificarAparicoes(planeta.get().getNome())));
+			}
+
+			return ResponseEntity.notFound().build();
+		
 	}
 	
 	@GetMapping(path = "/nome/{nome}")
 	public ResponseEntity<?> listarPorNome(@PathVariable String nome){
-		try {
-			Planeta planeta =  cadastroPlanetaService.listarPorNome(nome);
-			return ResponseEntity
-					.ok(new PlanetaResponse(planeta, swapi.verificarAparicoes(planeta.getNome())));
+			Planeta planeta =  planetaRepository.findByNome(nome);
 			
-		}catch (EntidadeNaoEncontradaException e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND)
-					.body(e.getMessage());
-		}
+			if(planeta != null) {
+				return ResponseEntity
+					.ok(new PlanetaResponse(planeta, swapi.verificarAparicoes(planeta.getNome())));
+			}
+			return ResponseEntity.notFound().build();
 	}
 	
 	@PostMapping
-	public ResponseEntity<?> cadastrar(@Valid @RequestBody Planeta planeta){
-		try {
-			planeta = cadastroPlanetaService.adicionar(planeta);
-			return ResponseEntity
-					.ok(new PlanetaResponse(planeta, swapi.verificarAparicoes(planeta.getNome())));
-			
-		}catch (EntidadeNaoEncontradaException e) {
-			return ResponseEntity.badRequest()
-				.body(e.getMessage());
-		}
+	public Planeta cadastrar(@Valid @RequestBody Planeta planeta){
+			return planeta = cadastroPlaneta.salvar(planeta);
 	}
 	
 	@PutMapping(path = "/{id}")
 	public ResponseEntity<?> modificar(@PathVariable String id, @RequestBody Planeta planeta){
-		try {
-			planeta = cadastroPlanetaService.modificar(id, planeta);
 
-			return ResponseEntity.status(HttpStatus.OK)
-					.body(new PlanetaResponse(planeta, swapi.verificarAparicoes(planeta.getNome())));
-			
-		}catch (EntidadeNaoEncontradaException e) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-					.body(e.getMessage());
+		Optional<Planeta> planetaAtual = planetaRepository.findById(id);
+				
+		if( planetaAtual.isPresent()) {
+			BeanUtils.copyProperties(planeta, planetaAtual.get(), "id");
+			Planeta planetaSalvo = cadastroPlaneta.salvar(planetaAtual.get());
+			return ResponseEntity.ok(
+					new PlanetaResponse(planetaSalvo, swapi.verificarAparicoes(planetaSalvo.getNome())));
 		}
+		
+		return ResponseEntity.notFound().build();	
 	}
 	
 	@DeleteMapping(path = "/{id}")
 	public ResponseEntity<?> remover(@PathVariable String id){
 		try {
-			cadastroPlanetaService.remover(id);
+			cadastroPlaneta.excluir(id);
 		
 			return ResponseEntity.noContent().build();
 			

@@ -16,23 +16,7 @@ public class PlanetaResponse {
 	private String clima;
 	private String terreno;
 	private int numAparicoes;
-		
-	public PlanetaResponse(String id, String nome, String clima, String terreno, int numAparicoes) {
-		this.id = id;
-		this.nome = nome;
-		this.clima = clima;
-		this.terreno = terreno;
-		this.numAparicoes = numAparicoes;
-	}
-	
-	public PlanetaResponse(String id, String nome, String clima, String terreno) {
-		this.id = id;
-		this.nome = nome;
-		this.clima = clima;
-		this.terreno = terreno;
-		this.numAparicoes = 0;
-	}
-	
+			
 	public PlanetaResponse(Planeta planeta, int aparicoes) {
 		this.id = planeta.getId();
 		this.nome = planeta.getNome();

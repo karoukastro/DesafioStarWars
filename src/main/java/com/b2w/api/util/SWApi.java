@@ -15,8 +15,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.b2w.api.exception.ServiceUnavailable;
 import com.b2w.api.models.Planeta;
 import com.b2w.api.models.ResultApiSw;
-import com.b2w.api.services.CadastroPlanetaService;
-import com.b2w.api.services.impl.CadastroPlanetaServiceImpl;
+import com.b2w.api.repositories.PlanetaRepository;
+import com.b2w.api.services.impl.CadastroPlanetaService;
 
 /**
  * 
@@ -33,14 +33,15 @@ public class SWApi {
 	
 	private String url = "https://swapi.dev/api/"; 
 	
+	
 	@Autowired
-	private CadastroPlanetaServiceImpl planetaService;
+	private PlanetaRepository planetaRepository;
 	
 	/*
 	 * Recebe o nome do Planeta, pesquisa quantas vezes ele apareceu em filmes e retorna o valor
 	 */
 	public int verificarAparicoes(String nome) {
-	Planeta planetasRetornado =  planetaService.listarPorNome(nome);
+	Planeta planetasRetornado =  planetaRepository.findByNome(nome);
 		if(planetasRetornado != null) {
 			ResponseEntity<ResultApiSw> response = getAparicoes(nome);
 			if(response.getBody().getResults().size()> 0 ) {
